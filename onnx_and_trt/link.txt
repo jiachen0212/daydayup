@@ -1,0 +1,13 @@
+https://github.com/meituan/YOLOv6
+
+onnx：https://github.com/meituan/YOLOv6/tree/main/deploy/ONNX
+python ./deploy/ONNX/export_onnx.py \
+    --weights yolov6s.pt \
+    --img 640 \
+    --batch 1 \
+    --end2end \
+    --max-wh 7680
+
+trt: https://github.com/Linaom1214/tensorrt-python
+python export.py -o onnx-name -e trt-name -p fp32/16/int8
+
