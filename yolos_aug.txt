@@ -1,0 +1,9 @@
+1. hsv空间增强
+2. Letterbox  保持box比例不变且上下左右填0做scale
+3. mixup 
+4. cutout 
+5. flip 上下, 左右 
+6. mosaic(4切块合并, 感觉是一种增大batchsize的手法) 
+    yolo7甚至用上了, mosaic9
+7. copy_paste yolo5,7中的.  有点类似填鸭法.
+8. pytorch的albumentations库

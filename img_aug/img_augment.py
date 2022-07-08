@@ -55,9 +55,6 @@ def roata_and_scale(img, degrees=5, scale_r=1.2):
 
 
 
-
-
-
 if __name__ == '__main__':
 
 
