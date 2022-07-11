@@ -5,5 +5,12 @@
 5. flip 上下, 左右 
 6. mosaic(4切块合并, 感觉是一种增大batchsize的手法) 
     yolo7甚至用上了, mosaic9
-7. copy_paste yolo5,7中的.  有点类似填鸭法.
+7. copy_paste yolo5,7中的.  有点类似填鸭法.   
+Simple Copy-Paste is a Strong Data Augmentation Method
+for Instance Segmentation  https://arxiv.org/abs/2012.07177
+    1. 随机选择两幅训练图像
+    2. 随机尺度抖动缩放
+    3. 随机水平翻转
+    4. 随机选择一幅图像中的目标子集
+    5. 粘贴在另一幅图像中随机的位置
 8. pytorch的albumentations库
