@@ -5,12 +5,13 @@ import glob
 import os
 
 import torch
+print(torch.cuda.is_available())
 from setuptools import find_packages
 from setuptools import setup
 from torch.utils.cpp_extension import CUDA_HOME
 from torch.utils.cpp_extension import CppExtension
 from torch.utils.cpp_extension import CUDAExtension
-
+ 
 
 requirements = [
     "torchvision",
@@ -25,7 +26,10 @@ requirements = [
 
 
 def get_extensions():
-    extensions_dir = os.path.join("fcos_core", "csrc")
+    # extensions_dir = os.path.join("fcos_core", "csrc")
+
+    extensions_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "fcos_core", "csrc"))
 
     main_file = glob.glob(os.path.join(extensions_dir, "*.cpp"))
     source_cpu = glob.glob(os.path.join(extensions_dir, "cpu", "*.cpp"))
@@ -36,7 +40,7 @@ def get_extensions():
 
     extra_compile_args = {"cxx": []}
     define_macros = []
-
+    # CUDA_HOME = '/newdata/jiachen//cuda10'
     if (torch.cuda.is_available() and CUDA_HOME is not None) or os.getenv("FORCE_CUDA", "0") == "1":
         extension = CUDAExtension
         sources += source_cuda
@@ -74,5 +78,5 @@ setup(
     install_requires=requirements,
     ext_modules=get_extensions(),
     cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
-    include_package_data=True,
+    include_package_data=False,
 )
