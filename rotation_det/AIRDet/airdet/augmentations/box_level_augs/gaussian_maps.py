@@ -13,6 +13,7 @@ def _gaussian_map(img, boxes, scale_splits=None, scale_ratios=None):
 
     x_range = torch.arange(0, height, 1).to(img.device)
     y_range = torch.arange(0, width, 1).to(img.device)
+    # 用于生成坐标
     xx, yy = torch.meshgrid(x_range, y_range)
     pos = torch.empty(xx.shape + (2,)).to(img.device)
     pos[:, :, 0] = xx
@@ -43,6 +44,7 @@ def _gaussian_map(img, boxes, scale_splits=None, scale_ratios=None):
                     2.0 * var_y ** 2)))).to(
             img.device)
         g_maps += g_map
+
     return g_maps
 
 
@@ -50,4 +52,5 @@ def _merge_gaussian(img, img_aug, boxes, scale_ratios, scale_splits):
     g_maps = _gaussian_map(img, boxes, scale_splits, scale_ratios)
     g_maps = g_maps.clamp(min=0, max=1.0)
     out = img * (1 - g_maps) + img_aug * g_maps
+    
     return out

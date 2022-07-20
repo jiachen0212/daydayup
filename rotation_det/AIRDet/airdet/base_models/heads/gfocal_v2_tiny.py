@@ -28,8 +28,8 @@ def xyxy2CxCywh(xyxy, size=None):
     w = x2 - x1
     h = y2 - y1
     if size is not None:
-    	w = w.clamp(min=0, max=size[1])
-    	h = h.clamp(min=0, max=size[0])
+        w = w.clamp(min=0, max=size[1])
+        h = h.clamp(min=0, max=size[0])
     return torch.stack([cx, cy, w, h], axis=-1)
 
 
@@ -133,6 +133,7 @@ class GFocalHead_Tiny(nn.Module):
         if add_mean:
             self.total_dim += 1
 
+        # SimOTA
         self.assigner = SimOTAAssigner(
             center_radius=2.5,
             cls_weight=simOTA_cls_weight,
@@ -140,8 +141,11 @@ class GFocalHead_Tiny(nn.Module):
 
         super(GFocalHead_Tiny, self).__init__()
         self.integral = Integral(self.reg_max)
+        # DFL
         self.loss_dfl = DistributionFocalLoss(loss_weight=0.25)
+        # QFL
         self.loss_cls = QualityFocalLoss(use_sigmoid=False, beta=2.0, loss_weight=1.0)
+        # GIOU
         self.loss_bbox = GIoULoss(loss_weight=2.0)
 
         self._init_layers()
