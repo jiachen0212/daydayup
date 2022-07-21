@@ -21,8 +21,10 @@ MODEL:
     CENTER_SAMPLING_RADIUS: 1.5
     IOU_LOSS_TYPE: "giou"
 DATASETS:
-  TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
-  TEST: ("coco_2014_minival",)
+  # TRAIN: ("coco_2014_train", "coco_2014_valminusminival")
+  # TEST: ("coco_2014_minival",)
+    TRAIN: ("coco_2017_train", "coco_2017_val")
+    TEST: ("coco_2017_test_dev",)
 INPUT:
   MIN_SIZE_TRAIN: (800,)
   MAX_SIZE_TRAIN: 1333

@@ -44,6 +44,7 @@ class IOULoss(nn.Module):
         else:
             raise NotImplementedError
 
+        # weight是centerness*, 即: np.sqrt((min(l∗, r∗)/max(l∗, r∗))*(min(t∗, b∗)/max(t∗, b∗))) 离中心远的位置los变小.
         if weight is not None and weight.sum() > 0:
             return (losses * weight).sum()
         else:

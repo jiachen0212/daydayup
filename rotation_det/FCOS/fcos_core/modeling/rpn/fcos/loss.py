@@ -32,12 +32,13 @@ def reduce_sum(tensor):
     return tensor
 
 
-class FCOSLossComputation(object):
+class FCOSLossComputation(object): 
     """
     This class computes the FCOS losses.
     """
 
     def __init__(self, cfg):
+        # cls loss: sigmoid focal loss 
         self.cls_loss_func = SigmoidFocalLoss(
             cfg.MODEL.FCOS.LOSS_GAMMA,
             cfg.MODEL.FCOS.LOSS_ALPHA
@@ -47,8 +48,9 @@ class FCOSLossComputation(object):
         self.iou_loss_type = cfg.MODEL.FCOS.IOU_LOSS_TYPE
         self.norm_reg_targets = cfg.MODEL.FCOS.NORM_REG_TARGETS
 
-        # we make use of IOU Loss for bounding boxes regression,
-        # but we found that L1 in log scale can yield a similar performance
+        # we make use of IOU Loss for bounding boxes regression, but we found that L1 in log scale can yield a similar performance
+        # reg: IOU loss, 
+        # centerness: BCE loss
         self.box_reg_loss_func = IOULoss(self.iou_loss_type)
         self.centerness_loss_func = nn.BCEWithLogitsLoss(reduction="sum")
 
@@ -95,8 +97,10 @@ class FCOSLossComputation(object):
         right = center_gt[..., 2] - gt_xs[:, None]
         top = gt_ys[:, None] - center_gt[..., 1]
         bottom = center_gt[..., 3] - gt_ys[:, None]
+        # 如果要做倾斜box检测的话, 这里应该修改为: todo
         center_bbox = torch.stack((left, top, right, bottom), -1)
         inside_gt_bbox_mask = center_bbox.min(-1)[0] > 0
+
         return inside_gt_bbox_mask
 
     def prepare_targets(self, points, targets):
@@ -145,6 +149,7 @@ class FCOSLossComputation(object):
 
         return labels_level_first, reg_targets_level_first
 
+    # box_reg 
     def compute_targets_for_locations(self, locations, targets, object_sizes_of_interest):
         labels = []
         reg_targets = []
@@ -177,13 +182,15 @@ class FCOSLossComputation(object):
 
             max_reg_targets_per_im = reg_targets_per_im.max(dim=2)[0]
             # limit the regression range for each location
+            # paper重的每一P-level分配对应面积范围的目标做box-reg
+            # if a location satisfies max(l∗, t∗, r∗, b∗) > mi or max(l∗, t∗, r∗, b∗) < mi-1
             is_cared_in_the_level = \
                 (max_reg_targets_per_im >= object_sizes_of_interest[:, [0]]) & \
                 (max_reg_targets_per_im <= object_sizes_of_interest[:, [1]])
 
             locations_to_gt_area = area[None].repeat(len(locations), 1)
             locations_to_gt_area[is_in_boxes == 0] = INF
-            locations_to_gt_area[is_cared_in_the_level == 0] = INF
+            locations_to_gt_area[is_cared_in_the_level == 0] = INF 
 
             # if there are still more than one objects for a location,
             # we choose the one with minimal area
@@ -197,10 +204,13 @@ class FCOSLossComputation(object):
             reg_targets.append(reg_targets_per_im)
 
         return labels, reg_targets
-
+    
+    # 计算centerness_loss 
     def compute_centerness_targets(self, reg_targets):
         left_right = reg_targets[:, [0, 2]]
         top_bottom = reg_targets[:, [1, 3]]
+        # 如果要做倾斜box检测的话, 则需要补充齐4个点.
+        # top_bottom = reg_targets[:, [5, 7]]
         centerness = (left_right.min(dim=-1)[0] / left_right.max(dim=-1)[0]) * \
                       (top_bottom.min(dim=-1)[0] / top_bottom.max(dim=-1)[0])
         return torch.sqrt(centerness)
@@ -268,8 +278,10 @@ class FCOSLossComputation(object):
             reg_loss = self.box_reg_loss_func(
                 box_regression_flatten,
                 reg_targets_flatten,
-                centerness_targets
+                # centerness_targets can downweight the scores of bounding boxes far from the center of an object.
+                centerness_targets  # 做为weight对iou-loss加权, paper的公式(3). sqrt((min(l∗, r∗)/max(l∗, r∗))*(min(t∗, b∗)/max(t∗, b∗))) 
             ) / sum_centerness_targets_avg_per_gpu
+            # 
             centerness_loss = self.centerness_loss_func(
                 centerness_flatten,
                 centerness_targets

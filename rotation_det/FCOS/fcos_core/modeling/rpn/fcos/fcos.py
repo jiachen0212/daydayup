@@ -68,6 +68,7 @@ class FCOSHead(torch.nn.Module):
             in_channels, 4, kernel_size=3, stride=1,
             padding=1
         )
+        # centerness, 出中心点的方法就是接一个conv而已
         self.centerness = nn.Conv2d(
             in_channels, 1, kernel_size=3, stride=1,
             padding=1
@@ -90,8 +91,11 @@ class FCOSHead(torch.nn.Module):
         self.scales = nn.ModuleList([Scale(init_value=1.0) for _ in range(5)])
 
     def forward(self, x):
+        # 分类分支
         logits = []
+        # 回归tblr分支
         bbox_reg = []
+        # 中心点centerness分支
         centerness = []
         for l, feature in enumerate(x):
             cls_tower = self.cls_tower(feature)
@@ -112,6 +116,7 @@ class FCOSHead(torch.nn.Module):
                     bbox_reg.append(bbox_pred * self.fpn_strides[l])
             else:
                 bbox_reg.append(torch.exp(bbox_pred))
+
         return logits, bbox_reg, centerness
 
 
@@ -205,8 +210,10 @@ class FCOSModule(torch.nn.Module):
         shift_y, shift_x = torch.meshgrid(shifts_y, shifts_x)
         shift_x = shift_x.reshape(-1)
         shift_y = shift_y.reshape(-1)
+        # [s/2]+sx, [s/2]+sy 映射回原图
         locations = torch.stack((shift_x, shift_y), dim=1) + stride // 2
+
         return locations
 
 def build_fcos(cfg, in_channels):
-    return FCOSModule(cfg, in_channels)
+    return FCOSModule(cfg, in_channels)  
