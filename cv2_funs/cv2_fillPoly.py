@@ -19,3 +19,8 @@ rec3 = np.array([[0,740], [0,H], [W,H], [W,740]])
 rec4 = np.array([[1030,385], [1030,740], [W,740], [W,385]])
 cv2.fillPoly(img_gray, [rec1, rec2, rec3, rec4], (255,255,255))
 cv2.imwrite('./caffe.jpg', img_gray)
+
+
+# 计算图像四个通道上的平均值
+image = cv2.imread('/Users/chenjia/Desktop/1.png')
+print(cv2.mean(image))
