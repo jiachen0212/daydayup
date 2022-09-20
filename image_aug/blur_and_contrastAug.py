@@ -59,3 +59,32 @@ plt.subplot(133)
 plt.xlabel('gamma_aug')
 plt.imshow(img_gamma[..., ::-1])
 plt.show()
+
+
+
+
+# 可视化图像的直方图
+def hist_lines(im):
+    """
+    以线条模式绘制直方图(适用灰度图)
+    """
+    h = np.zeros((300, 256, 3))
+    if len(im.shape) != 2:
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    hist_item = cv2.calcHist([im], [0], None, [256], [0, 255])
+    # 直方图归一化
+    cv2.normalize(hist_item, hist_item, 0, 255, cv2.NORM_MINMAX)
+    hist = np.int32(np.around(hist_item))
+    # 绘制直线
+    for x, y in enumerate(hist):
+        print(x, y)
+        cv2.line(h, (x, 0), (x, y[0]), (255, 255, 255))
+    # 将图片上下翻转
+    y = np.flipud(h)
+    # cv2.imwrite('./12.jpg', y)
+    return y
+
+
+
+
+
