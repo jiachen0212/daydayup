@@ -1,0 +1,20 @@
+个人感觉, 分割中两个很有代表性的进步: dilate, attention
+一个不降低分辨率的提升感受野, 一个有很好的全局上下文语义捕捉能力. 
+
+1. D-LinkNet: cvpr2018道路分割 
+设计不同感受野尺度适应数据, dilate conv
+数据增强很重要  (色彩抖动, 外形变换)
+二分类语义分割 U-net很有效 
+类似resnet中跨层直连结构
+
+
+
+2. Dual Attention Network for Scene Segmentation: cvpr2019场景分割
+self-attention捕捉上下文依赖 
+dual-attention双重attention: hw平面维度attention, channel维度attention, 重视某张feature map. (自适应merge局部,全局的特征)
+
+
+
+3. 
+
+
