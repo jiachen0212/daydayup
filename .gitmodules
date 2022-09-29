@@ -1,0 +1,3 @@
+[submodule "cvpr2022/afa/afa"]
+	path = cvpr2022/afa/afa
+	url = git@github.com:rulixiang/afa.git
