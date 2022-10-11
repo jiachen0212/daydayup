@@ -54,6 +54,7 @@ def run():
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)  # choose GPU:0
     image = cv2.imread(args.input_image_path)
 
+    #1. 单张图像预聚类, 分出很多相似块
     '''segmentation ML'''
     seg_map = segmentation.felzenszwalb(image, scale=32, sigma=0.5, min_size=64)
     # seg_map = segmentation.slic(image, n_segments=10000, compactness=100)
@@ -61,6 +62,7 @@ def run():
     seg_lab = [np.where(seg_map == u_label)[0]
                for u_label in np.unique(seg_map)]
 
+    # 训练CNN, 一边训一边随着iter直接inference用
     '''train init'''
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
@@ -89,6 +91,7 @@ def run():
         target = torch.argmax(output, 1)
         im_target = target.data.cpu().numpy()
 
+        # CNN refine, 用CNN把一些可以合并的小块合并. 
         '''refine'''
         for inds in seg_lab:
             u_labels, hist = np.unique(im_target[inds], return_counts=True)
