@@ -87,24 +87,28 @@ def run():
         '''forward'''
         optimizer.zero_grad()
         output = model(tensor)[0]
+        # output是feature map, 输出维度32, 即粗分类类别: 0~31 
         output = output.permute(1, 2, 0).view(-1, args.mod_dim2)
+        # argmax下可得到初步的CNN分割结果 
         target = torch.argmax(output, 1)
         im_target = target.data.cpu().numpy()
 
-        # CNN refine, 用CNN把一些可以合并的小块合并. 
+        # CNN refine, 用CNN把一些可以合并的小块合并掉. 
         '''refine'''
         for inds in seg_lab:
             # np.unique: 返回不重复元素, 各元素个数 
+            # im_target[inds]: 元素值都在0~31内
             u_labels, hist = np.unique(im_target[inds], return_counts=True)
-            # 取数值最大者为对应像素的标签
-            im_target[inds] = u_labels[np.argmax(hist)]
+            # 取数值最大者为对应像素的标签. 其实是在优化赋值C
+            im_target[inds] = u_labels[np.argmax(hist)]   # S中的ind分块, 用C中的arg结果, 优化重新赋值了. 
 
         '''backward'''
         target = torch.from_numpy(im_target)
         target = target.to(device)
+        # 交叉熵优化, 让CNN学习到的特征图更接近seg结果. 
         loss = criterion(output, target)
         loss.backward()
-        optimizer.step()
+        optimizer.step() 
 
         '''show image'''
         un_label, lab_inverse = np.unique(im_target, return_inverse=True, )
