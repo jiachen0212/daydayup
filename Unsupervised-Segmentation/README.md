@@ -1,3 +1,5 @@
+# fork from: https://github.com/Yonv1943/Unsupervised-Segmentation.git
+
 ## Unsupervised-Segmentation
 ### An implementation of **Unsupervised Image Segmentation by Backpropagation  - Asako Kanezaki 金崎朝子** （東京大学）ICASSP. 2018. 
 ### **Faster and more elegant than origin version. Speed up, 30s(origin) --> 5s(modify)**
