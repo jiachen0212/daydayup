@@ -94,7 +94,9 @@ def run():
         # CNN refine, 用CNN把一些可以合并的小块合并. 
         '''refine'''
         for inds in seg_lab:
+            # np.unique: 返回不重复元素, 各元素个数 
             u_labels, hist = np.unique(im_target[inds], return_counts=True)
+            # 取数值最大者为对应像素的标签
             im_target[inds] = u_labels[np.argmax(hist)]
 
         '''backward'''
