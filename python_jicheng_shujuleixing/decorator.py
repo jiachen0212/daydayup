@@ -1,5 +1,5 @@
+# https://zhuanlan.zhihu.com/p/269012332
 from time import time, sleep
-
 
 
 #1. 无参数的装饰器
