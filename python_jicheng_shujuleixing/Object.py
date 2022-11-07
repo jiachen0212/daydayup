@@ -1,6 +1,8 @@
 # coding=utf-8
 # 面向对象编程
 
+# 1. __name 前置双下划线, 仅可内部访问, 外部不可
+# 2. __fun__ 前后均双下划线, 是类的内置方法. 
 
 # __call__
 class Person(object):
