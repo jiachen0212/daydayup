@@ -1,0 +1,10 @@
+浅谈爬虫:
+
+
+1. 发送请求返回内容
+2. 分析服务器返回的内容: 正则表达式 or python beautifulsoup
+3. 采集保存, 继续抓or停止
+
+
+
+python的urllib2是下载器, 
