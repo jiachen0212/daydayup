@@ -1,0 +1,7 @@
+hook: https://zhuanlan.zhihu.com/p/222496848
+
+    因为pytorch是动态图, so部分节点的梯度在计算后被清除了. 想要在[计算结束后]获取他们的梯度, 则需要用hook注册一些函数, 实现对应功能.
+
+    1. 注册反向传播hook函数, 输入为: 张量的梯度, 可用来获取中间一些叶节点梯度: torch.Tensor.register_hook(hook); hook(grad)
+    2. 注册module前向传播hook函数, 可用于获取中间层feature map: torch.nn.Module.register_forward_hook(hook); hook(module, input, output)
+    
